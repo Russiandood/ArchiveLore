@@ -1,0 +1,148 @@
+// Prisma schema (minimal MVP)
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum PageState {
+  IDLE
+  ACTIVE
+  COMPLETED
+}
+
+model User {
+  id              String   @id @default(cuid())
+  twitchUserId    String   @unique
+  displayName     String
+  email           String?
+  createdAt       DateTime @default(now())
+  memberships     Membership[]
+  checkIns        CheckIn[]
+  inventory       Inventory[]
+  essenceTicks    EssenceTick[]
+  craftJobs       CraftJob[]
+  ledgerEntries   Ledger[]
+}
+
+model Channel {
+  id             String   @id @default(cuid())
+  twitchChannelId String  @unique
+  name           String
+  planTier       Int      @default(0)
+  createdAt      DateTime @default(now())
+  memberships    Membership[]
+  pages          Page[]
+  blessings      BlessingGrant[]
+}
+
+model Membership {
+  id         String  @id @default(cuid())
+  role       String
+  user       User    @relation(fields: [userId], references: [id])
+  userId     String
+  channel    Channel @relation(fields: [channelId], references: [id])
+  channelId  String
+}
+
+model Inventory {
+  id         String   @id @default(cuid())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  channel    Channel  @relation(fields: [channelId], references: [id])
+  channelId  String
+  // Quantities by tier as JSON maps for MVP; can normalize later
+  materials  Json     @default("{}")
+  essence    Json     @default("{}")
+  sparks     Json     @default("{}")
+  updatedAt  DateTime @updatedAt
+  @@unique([userId, channelId])
+}
+
+model CheckIn {
+  id         String   @id @default(cuid())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  channel    Channel  @relation(fields: [channelId], references: [id])
+  channelId  String
+  date       DateTime
+  rolls      Json
+  relicPity  Int      @default(0)
+  createdAt  DateTime @default(now())
+  @@unique([userId, channelId, date])
+}
+
+model Page {
+  id            String   @id @default(cuid())
+  channel       Channel  @relation(fields: [channelId], references: [id])
+  channelId     String
+  tier          Int
+  state         PageState
+  progressValue Int       @default(0)
+  progressGoal  Int       @default(100)
+  pityCounters  Json      @default("{}")
+  startedAt     DateTime?
+  completedAt   DateTime?
+}
+
+model PageReward {
+  id        String   @id @default(cuid())
+  page      Page     @relation(fields: [pageId], references: [id])
+  pageId    String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  bundle    Json
+  grantedAt DateTime @default(now())
+}
+
+model EssenceTick {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  channel   Channel  @relation(fields: [channelId], references: [id])
+  channelId String
+  tickAt    DateTime
+  rarity    Int
+  amount    Int
+  streak    Int
+  @@unique([userId, channelId, tickAt])
+}
+
+model CraftJob {
+  id         String   @id @default(cuid())
+  user       User     @relation(fields: [userId], references: [id])
+  userId     String
+  channel    Channel  @relation(fields: [channelId], references: [id])
+  channelId  String
+  type       String
+  input      Json
+  output     Json
+  status     String    @default("PENDING")
+  createdAt  DateTime  @default(now())
+}
+
+model BlessingGrant {
+  id         String   @id @default(cuid())
+  channel    Channel  @relation(fields: [channelId], references: [id])
+  channelId  String
+  type       String    // sacred-individual or divine-global
+  userId     String?   // nullable for global
+  details    Json
+  grantedAt  DateTime  @default(now())
+}
+
+model Ledger {
+  id            String   @id @default(cuid())
+  user          User     @relation(fields: [userId], references: [id])
+  userId        String
+  channel       Channel  @relation(fields: [channelId], references: [id])
+  channelId     String
+  delta         Json
+  reason        String
+  correlationId String
+  createdAt     DateTime @default(now())
+  @@index([correlationId])
+}

@@ -1,0 +1,14 @@
+{
+  "name": "@osg/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "bullmq": "^5.5.0",
+    "ioredis": "^5.3.2",
+    "tsx": "^4.7.0"
+  }
+}

@@ -1,0 +1,1 @@
+export async function GET(){return new Response(JSON.stringify({ok:true,service:'api',time:new Date().toISOString()}),{headers:{'content-type':'application/json'}})}

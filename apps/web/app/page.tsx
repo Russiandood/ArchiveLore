@@ -1,0 +1,1 @@
+export default function Page(){return(<main style={{padding:24}}><h1>On-Stream Game</h1><p>Web app is alive. Next: wire Twitch login and dashboards.</p></main>)}

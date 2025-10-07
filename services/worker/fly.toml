@@ -1,0 +1,11 @@
+app = "osg-worker"
+primary_region = "sea"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  REDIS_URL = ""
+
+[processes]
+  app = "node services/worker/src/index.ts"

@@ -1,0 +1,19 @@
+{
+  "name": "osg-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@9.0.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "services/*"
+  ],
+  "scripts": {
+    "dev:web": "pnpm --filter @osg/web dev",
+    "dev:api": "pnpm --filter @osg/api dev",
+    "dev:worker": "pnpm --filter @osg/worker dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "format": "pnpm -r format"
+  }
+}

@@ -1,0 +1,1 @@
+export default function Page(){return(<main style={{padding:24}}><h1>OSG API Host</h1><p>Try <code>/api/health</code> to see a health check.</p></main>)}
