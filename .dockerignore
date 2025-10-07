@@ -1,0 +1,32 @@
+# Ignore everything by default, then whitelist the workspaces we need
+**
+
+# Whitelist workspace roots and metadata needed for installs
+!package.json
+!pnpm-lock.yaml
+!pnpm-workspace.yaml
+!.npmrc
+!tsconfig.base.json 
+
+# Whitelist only the source we need
+!apps/**
+!packages/**
+!services/**
+
+# Ignore common junk inside those folders
+**/node_modules
+**/.next
+**/dist
+**/build
+**/out
+**/.turbo
+**/.cache
+**/.vercel
+**/.DS_Store
+**/*.log
+**/.env
+**/.env.*
+**/.git
+**/.git/**
+Thumbs.db
+desktop.ini

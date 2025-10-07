@@ -1,9 +1,15 @@
 # Multi-stage build for Next.js API host
 FROM node:20-slim AS deps
 WORKDIR /app
-COPY package.json pnpm-lock.yaml .npmrc ./
+
+# Root-level workspace metadata
+COPY package.json pnpm-lock.yaml .npmrc pnpm-workspace.yaml tsconfig.base.json ./
+
+# Workspaces
 COPY packages ./packages
 COPY apps/api/package.json ./apps/api/package.json
+
+# Install (workspace-aware)
 RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
 RUN pnpm install --frozen-lockfile
 

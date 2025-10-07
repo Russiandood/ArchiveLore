@@ -1,11 +1,11 @@
 app = "osg-worker"
-primary_region = "sea"
+primary_region = "sjc"
 
 [build]
   dockerfile = "Dockerfile"
 
 [env]
-  REDIS_URL = ""
+  REDIS_URL ="redis://localhost:6379"
 
 [processes]
   app = "node services/worker/src/index.ts"
