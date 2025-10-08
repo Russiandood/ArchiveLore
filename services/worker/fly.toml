@@ -5,7 +5,4 @@ primary_region = "sjc"
   dockerfile = "Dockerfile"
 
 [env]
-  REDIS_URL ="redis://localhost:6379"
-
-[processes]
-  app = "node services/worker/src/index.ts"
+  REDIS_URL ="rediss://default:ASTrAAImcDIwODVjZWIzMjkwNmY0MzA0OTZmMWE1NzcwOTIzODU4MnAyOTQ1MQ@engaging-stud-9451.upstash.io:6379"

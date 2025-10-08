@@ -24,5 +24,7 @@ WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=build /app/apps/api/.next/standalone ./
 COPY --from=build /app/apps/api/.next/static ./apps/api/.next/static
+# (optional but harmless) include public if you use it:
+# COPY --from=build /app/apps/api/public ./apps/api/public
 EXPOSE 3001
-CMD ["node", "server.js"]
+CMD ["node", "apps/api/server.js"]
