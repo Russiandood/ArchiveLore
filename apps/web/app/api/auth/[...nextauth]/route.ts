@@ -2,12 +2,9 @@ import NextAuth from "next-auth";
 import TwitchProvider from "next-auth/providers/twitch";
 
 const handler = NextAuth({
-  providers: [
-    TwitchProvider({
-      clientId: process.env.TWITCH_CLIENT_ID!,
-      clientSecret: process.env.TWITCH_CLIENT_SECRET!,
-    }),
-  ],
+  providers: [TwitchProvider({ clientId: process.env.TWITCH_CLIENT_ID!, clientSecret: process.env.TWITCH_CLIENT_SECRET! })],
+  trustHost: true,
+  session: { strategy: "jwt" },
   callbacks: {
     async jwt({ token, account, profile }) {
       if (account) {
@@ -15,7 +12,6 @@ const handler = NextAuth({
         token.providerAccountId = account.providerAccountId;
       }
       if (profile && typeof profile === "object") {
-        // Useful basics for your UI
         // @ts-ignore
         token.twitchLogin = profile.login ?? token.twitchLogin;
         // @ts-ignore
@@ -26,7 +22,6 @@ const handler = NextAuth({
       return token;
     },
     async session({ session, token }) {
-      // surface a few fields for the UI
       // @ts-ignore
       session.accessToken = token.access_token;
       // @ts-ignore
@@ -38,8 +33,6 @@ const handler = NextAuth({
       return session;
     },
   },
-  session: { strategy: "jwt" },
   secret: process.env.NEXTAUTH_SECRET,
 });
-
 export { handler as GET, handler as POST };
