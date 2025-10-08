@@ -8,10 +8,13 @@ export default function AuthButton() {
   if (!session)
     return <button onClick={() => signIn("twitch")} className="border px-3 py-2 rounded">Sign in with Twitch</button>;
 
+  const img = session.user?.image as string | undefined;
+  const name = session.user?.name ?? "Twitch User";
+
   return (
     <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-      {session?.profileImageUrl ? <img src={session.profileImageUrl as string} width={28} height={28} style={{ borderRadius: 999 }} /> : null}
-      <span>Hi, {session?.displayName ?? "Twitch User"}</span>
+      {img ? <img src={img} width={28} height={28} style={{ borderRadius: 999 }} /> : null}
+      <span>Hi, {name}</span>
       <button onClick={() => signOut()} className="border px-3 py-2 rounded">Sign out</button>
     </div>
   );

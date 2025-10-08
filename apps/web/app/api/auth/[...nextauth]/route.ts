@@ -36,16 +36,23 @@ const authOptions: AuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      // @ts-ignore
-      session.accessToken = token.access_token;
-      // @ts-ignore
-      session.twitchLogin = token.twitchLogin;
-      // @ts-ignore
-      session.displayName = token.displayName;
-      // @ts-ignore
-      session.profileImageUrl = token.profileImageUrl;
-      return session;
-    },
+        // Populate standard fields so TS is happy
+        const name = (token as any).displayName ?? session.user?.name ?? "Twitch User";
+        const image = (token as any).profileImageUrl ?? session.user?.image;
+
+        // NextAuth expects user to exist
+        session.user = {
+            ...(session.user ?? {}),
+            name,
+            image,
+        };
+
+        // Keep access token if you want it later
+        // @ts-ignore
+        session.accessToken = (token as any).access_token;
+
+        return session;
+        },
   },
   secret: process.env.NEXTAUTH_SECRET,
 };
