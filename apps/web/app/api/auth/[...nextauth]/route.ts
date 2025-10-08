@@ -1,14 +1,14 @@
 import NextAuth, { type AuthOptions } from "next-auth";
 import TwitchProvider from "next-auth/providers/twitch";
 
-// Fallback so previews work without hard-coding:
-// Vercel sets VERCEL_URL on preview builds.
+// Fallback so previews work (sets NEXTAUTH_URL if missing)
 const url =
   process.env.NEXTAUTH_URL ??
   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
 process.env.NEXTAUTH_URL = url;
 
-export const authOptions: AuthOptions = {
+// NOTE: do NOT export this from a route file
+const authOptions: AuthOptions = {
   providers: [
     TwitchProvider({
       clientId: process.env.TWITCH_CLIENT_ID!,
@@ -25,12 +25,13 @@ export const authOptions: AuthOptions = {
         token.providerAccountId = account.providerAccountId;
       }
       if (profile && typeof profile === "object") {
+        const p = profile as any;
         // @ts-ignore
-        token.twitchLogin = (profile as any).login ?? token.twitchLogin;
+        token.twitchLogin = p.login ?? token.twitchLogin;
         // @ts-ignore
-        token.displayName = (profile as any).display_name ?? token.displayName;
+        token.displayName = p.display_name ?? token.displayName;
         // @ts-ignore
-        token.profileImageUrl = (profile as any).profile_image_url ?? token.profileImageUrl;
+        token.profileImageUrl = p.profile_image_url ?? token.profileImageUrl;
       }
       return token;
     },
