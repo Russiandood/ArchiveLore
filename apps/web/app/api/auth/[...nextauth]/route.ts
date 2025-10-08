@@ -1,23 +1,36 @@
-import NextAuth from "next-auth";
+import NextAuth, { type AuthOptions } from "next-auth";
 import TwitchProvider from "next-auth/providers/twitch";
 
-const handler = NextAuth({
-  providers: [TwitchProvider({ clientId: process.env.TWITCH_CLIENT_ID!, clientSecret: process.env.TWITCH_CLIENT_SECRET! })],
-  trustHost: true,
+// Fallback so previews work without hard-coding:
+// Vercel sets VERCEL_URL on preview builds.
+const url =
+  process.env.NEXTAUTH_URL ??
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+process.env.NEXTAUTH_URL = url;
+
+export const authOptions: AuthOptions = {
+  providers: [
+    TwitchProvider({
+      clientId: process.env.TWITCH_CLIENT_ID!,
+      clientSecret: process.env.TWITCH_CLIENT_SECRET!,
+    }),
+  ],
   session: { strategy: "jwt" },
   callbacks: {
     async jwt({ token, account, profile }) {
       if (account) {
+        // @ts-ignore
         token.access_token = account.access_token;
+        // @ts-ignore
         token.providerAccountId = account.providerAccountId;
       }
       if (profile && typeof profile === "object") {
         // @ts-ignore
-        token.twitchLogin = profile.login ?? token.twitchLogin;
+        token.twitchLogin = (profile as any).login ?? token.twitchLogin;
         // @ts-ignore
-        token.displayName = profile.display_name ?? token.displayName;
+        token.displayName = (profile as any).display_name ?? token.displayName;
         // @ts-ignore
-        token.profileImageUrl = profile.profile_image_url ?? token.profileImageUrl;
+        token.profileImageUrl = (profile as any).profile_image_url ?? token.profileImageUrl;
       }
       return token;
     },
@@ -34,5 +47,7 @@ const handler = NextAuth({
     },
   },
   secret: process.env.NEXTAUTH_SECRET,
-});
+};
+
+const handler = NextAuth(authOptions);
 export { handler as GET, handler as POST };
