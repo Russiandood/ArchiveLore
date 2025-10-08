@@ -15,5 +15,11 @@
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
     "format": "pnpm -r format"
+  },
+  "dependencies": {
+    "@auth/prisma-adapter": "^2.10.0",
+    "@prisma/client": "^5.15.0",
+    "next-auth": "^4.24.11",
+    "prisma": "^5.15.0"
   }
 }
