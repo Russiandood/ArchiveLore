@@ -1,4 +1,16 @@
 import { NextResponse } from "next/server";
+import { Redis } from "@upstash/redis";
+import { RedisKeys, TTL } from "@/lib/redisKeys";
+import { trackCommands } from "@/lib/cost-metrics";
+
+
+export const runtime = "edge";
+
+
+/**
+* Body: { userId: string, recipeId: string, amount?: number }
+* Assumes a cached recipe at RedisKeys.craft.recipe(recipeId) with fields like:
+* input_materials.mundane_dust = 10 (JSON string in a single hash field `input_materials`)
 * input_essence.mundane = 5
 * output_material = "curious_ore"
 * output_amount = 1
@@ -40,26 +52,36 @@ const inv = RedisKeys.inv(userId);
 
 // 1) Validate balances
 if (Object.keys(inputsMat).length) {
-const matFields = Object.keys(inputsMat);
-const matVals = await redis.hmget<number[]>(inv.materials, ...matFields);
-for (let i = 0; i < matFields.length; i++) {
-const need = inputsMat[matFields[i]] * amount;
-const have = Number(matVals?.[i] ?? 0);
-if (have < need) return NextResponse.json({ ok: false, error: `need ${need} of ${matFields[i]}` }, { status: 400 });
+    const matFields = Object.keys(inputsMat);
+    const matAll = (await redis.hgetall<Record<string, string>>(inv.materials)) ?? {};
+    for (let i = 0; i < matFields.length; i++) {
+        const field = matFields[i];
+        const need = inputsMat[field] * amount;
+        const have = Number(matAll[field] ?? 0);
+        if (have < need) {
+            return NextResponse.json({ ok: false, error: `need ${need} of ${field}` }, { status: 400 });
+        }
+    }
 }
-}
+
+
 if (Object.keys(inputsEss).length) {
-const essFields = Object.keys(inputsEss);
-const essVals = await redis.hmget<number[]>(inv.essence, ...essFields);
-for (let i = 0; i < essFields.length; i++) {
-const need = inputsEss[essFields[i]] * amount;
-const have = Number(essVals?.[i] ?? 0);
-if (have < need) return NextResponse.json({ ok: false, error: `need ${need} essence of ${essFields[i]}` }, { status: 400 });
+    const essFields = Object.keys(inputsEss);
+    const essAll = (await redis.hgetall<Record<string, string>>(inv.essence)) ?? {};
+    for (let i = 0; i < essFields.length; i++) {
+        const field = essFields[i];
+        const need = inputsEss[field] * amount;
+        const have = Number(essAll[field] ?? 0);
+        if (have < need) {
+            return NextResponse.json({ ok: false, error: `need ${need} essence of ${field}` }, { status: 400 });
+        }
+    }
 }
-}
+
+
 if (sparkTier) {
-const sparkHave = Number((await redis.hget(inv.sparks, sparkTier)) ?? 0);
-if (sparkHave < amount) return NextResponse.json({ ok: false, error: `need ${amount} ${sparkTier} spark` }, { status: 400 });
+    const sparkHave = Number((await redis.hget(inv.sparks, sparkTier)) ?? 0);
+    if (sparkHave < amount) return NextResponse.json({ ok: false, error: `need ${amount} ${sparkTier} spark` }, { status: 400 });
 }
 
 
