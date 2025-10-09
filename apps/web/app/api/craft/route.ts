@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { Redis } from "@upstash/redis";
 import { RedisKeys, TTL } from "@/lib/redisKeys";
+import { trackCommands } from "@/lib/cost-metrics";
 
 export const runtime = "edge"; // you can switch to "nodejs" while debugging
 
