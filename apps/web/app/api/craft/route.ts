@@ -4,7 +4,7 @@ import { Redis } from "@upstash/redis";
 import { RedisKeys, TTL } from "@/lib/redisKeys";
 import { trackCommands } from "@/lib/cost-metrics";
 
-export const runtime = "nodejs";            // keep Node while debugging
+export const runtime = "edge";            // keep Node while debugging
 export const dynamic = "force-dynamic";     // never static
 
 export async function POST(req: Request) {
