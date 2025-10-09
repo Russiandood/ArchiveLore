@@ -21,35 +21,48 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     async jwt({ token, account, profile }) {
-      if (account) {
-        (token as any).access_token = (account as any).access_token;
+      if (account?.access_token) {
+        try {
+          const res = await fetch("https://api.twitch.tv/helix/users", {
+            headers: {
+              "Client-Id": process.env.TWITCH_CLIENT_ID!,
+              Authorization: `Bearer ${account.access_token}`,
+            },
+            cache: "no-store",
+          });
+          if (res.ok) {
+            const { data } = await res.json();
+            const u = Array.isArray(data) ? data[0] : null;
+            if (u) {
+              (token as any).twitchId = u.id ?? null;
+              (token as any).twitchLogin = u.login ?? null;
+              (token as any).displayName = u.display_name ?? token.name ?? null;
+              (token as any).image = u.profile_image_url ?? null;
+              (token as any).profileImageUrl = (token as any).image;
+            }
+          }
+        } catch {}
+        (token as any).access_token = account.access_token;
         (token as any).providerAccountId = (account as any).providerAccountId;
       }
       if (profile && typeof profile === "object") {
         const p = profile as any;
-        (token as any).twitchLogin = p.login ?? (token as any).twitchLogin;
-        (token as any).displayName = p.display_name ?? (token as any).displayName ?? token.name;
-        (token as any).image =
-          p.profile_image_url ??
-          (token as any).image ??
-          (token as any).picture ??
-          null;
-        (token as any).profileImageUrl = (token as any).image; // back-compat
         (token as any).twitchId = p.sub ?? p.id?.toString() ?? (token as any).twitchId ?? null;
+        (token as any).twitchLogin = p.login ?? (token as any).twitchLogin ?? null;
+        (token as any).displayName =
+          p.display_name ?? (token as any).displayName ?? token.name ?? null;
+        (token as any).image =
+          p.profile_image_url ?? p.picture ?? (token as any).image ?? null;
+        (token as any).profileImageUrl = (token as any).image;
       }
       return token;
     },
     async session({ session, token }) {
-
       session.user.id = token.sub as string;
-      (session.user as any).twitchId = (token as any).twitchId ?? null;
       session.user.name = (token as any).displayName ?? session.user.name ?? "Twitch User";
       session.user.image =
-        (token as any).profileImageUrl ??
-        (token as any).image ??
-        session.user.image ??
-        null;
-
+        (token as any).profileImageUrl ?? (token as any).image ?? session.user.image ?? null;
+      (session.user as any).twitchId = (token as any).twitchId ?? null;
       (session as any).accessToken = (token as any).access_token ?? null;
       return session;
     },
