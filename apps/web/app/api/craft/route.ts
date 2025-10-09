@@ -4,18 +4,20 @@ import { Redis } from "@upstash/redis";
 import { RedisKeys, TTL } from "@/lib/redisKeys";
 import { trackCommands } from "@/lib/cost-metrics";
 
-// While debugging, prefer Node runtime to avoid any Edge eval quirks.
-// You can switch back to "edge" later if you want.
-// (Leaving dynamic so this route is always executed server-side.)
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
+export const runtime = "nodejs";            // keep Node while debugging
+export const dynamic = "force-dynamic";     // never static
 
-// --- 1) Keep a tiny POST wrapper so the export is always registered
 export async function POST(req: Request) {
-  return realCraftHandler(req);
+  try {
+    return await realCraftHandler(req);
+  } catch (err: any) {
+    // Surface the error so we can see what's breaking
+    const message = err?.message || String(err);
+    console.error("[craft] Uncaught error:", message, err?.stack);
+    return NextResponse.json({ ok: false, error: message }, { status: 500 });
+  }
 }
 
-// --- 2) The real craft logic lives here (called by the wrapper)
 async function realCraftHandler(req: Request) {
   const redis = Redis.fromEnv();
 
@@ -23,7 +25,6 @@ async function realCraftHandler(req: Request) {
   const userId = parsed?.userId as string | undefined;
   const recipeId = parsed?.recipeId as string | undefined;
   const amount = Math.max(1, Number(parsed?.amount ?? 1));
-
   if (!userId || !recipeId || !Number.isFinite(amount) || amount <= 0) {
     return NextResponse.json({ ok: false, error: "invalid body" }, { status: 400 });
   }
@@ -55,7 +56,7 @@ async function realCraftHandler(req: Request) {
 
     const inv = RedisKeys.inv(userId);
 
-    // Validate balances (use HGETALL for simple typing)
+    // Validate balances
     if (Object.keys(inputsMat).length) {
       const matAll = (await redis.hgetall<Record<string, string>>(inv.materials)) ?? {};
       for (const field of Object.keys(inputsMat)) {
@@ -67,6 +68,7 @@ async function realCraftHandler(req: Request) {
         }
       }
     }
+
     if (Object.keys(inputsEss).length) {
       const essAll = (await redis.hgetall<Record<string, string>>(inv.essence)) ?? {};
       for (const field of Object.keys(inputsEss)) {
@@ -78,6 +80,7 @@ async function realCraftHandler(req: Request) {
         }
       }
     }
+
     if (sparkTier) {
       const sparkHave = Number((await redis.hget(inv.sparks, sparkTier)) ?? 0);
       if (sparkHave < amount) {
