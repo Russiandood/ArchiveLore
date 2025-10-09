@@ -18,11 +18,11 @@ const redis = Redis.fromEnv();
 const recipeId = "basic-upgrade";
 const recipeKey = RedisKeys.craft.recipe(recipeId);
 await redis.hset(recipeKey, {
-input_materials: JSON.stringify({ mundane_dust: 10 }),
-input_essence: JSON.stringify({ mundane: 5 }),
-output_material: "curious_ore",
-output_amount: 1,
-spark_tier: "mundane", // optional in your craft route
+    input_materials: JSON.stringify({ mundane_dust: 10 }),
+    input_essence: JSON.stringify({ mundane: 5 }),
+    output_material: "curious_ore",
+    output_amount: 1,
+    spark_tier: "mundane",
 });
 
 

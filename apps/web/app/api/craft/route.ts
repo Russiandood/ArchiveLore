@@ -18,6 +18,18 @@ export async function POST(req: Request) {
   }
 }
 
+function parseObj(val: unknown): Record<string, number> {
+  if (val == null) return {};
+  if (typeof val === "string") {
+    const s = val.trim();
+    if (s.startsWith("{") || s.startsWith("[")) return JSON.parse(s);
+    if (s === "[object Object]") return {};
+    return {};
+  }
+  if (typeof val === "object") return val as Record<string, number>;
+  return {};
+}
+
 async function realCraftHandler(req: Request) {
   const redis = Redis.fromEnv();
 
@@ -47,8 +59,8 @@ async function realCraftHandler(req: Request) {
       return NextResponse.json({ ok: false, error: "unknown recipe" }, { status: 404 });
     }
 
-    const inputsMat = JSON.parse(recipe.input_materials || "{}") as Record<string, number>;
-    const inputsEss = JSON.parse(recipe.input_essence || "{}") as Record<string, number>;
+    const inputsMat = parseObj(recipe.input_materials);
+    const inputsEss = parseObj(recipe.input_essence);
     const outputMaterial = recipe.output_material as string | undefined;
     const outputEssence = recipe.output_essence as string | undefined;
     const outputAmount = Number(recipe.output_amount ?? 1) * amount;
