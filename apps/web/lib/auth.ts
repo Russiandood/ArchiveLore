@@ -22,30 +22,44 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
-  callbacks: {
-    async jwt({ token, profile }) {
-      // On first sign-in run, `profile` is present - capture Twitch fields onto the JWT
-      if (profile) {
-        (token as any).twitchId =
-          (profile as any).sub ?? (profile as any).id?.toString() ?? null;
-        (token as any).displayName =
-          (profile as any).display_name ??
-          (profile as any).preferred_username ??
-          (profile as any).login ??
-          token.name ??
-          null;
-        (token as any).image =
-          (profile as any).profile_image_url ?? (token as any).picture ?? null;
+callbacks: {
+    async jwt({ token, account, profile }) {
+      if (account) {
+        // @ts-ignore
+        token.access_token = account.access_token;
+        // @ts-ignore
+        token.providerAccountId = account.providerAccountId;
+      }
+      if (profile && typeof profile === "object") {
+        const p = profile as any;
+        // @ts-ignore
+        token.twitchLogin = p.login ?? token.twitchLogin;
+        // @ts-ignore
+        token.displayName = p.display_name ?? token.displayName;
+        // @ts-ignore
+        token.profileImageUrl = p.profile_image_url ?? token.profileImageUrl;
       }
       return token;
     },
     async session({ session, token }) {
-      // Ensure id + image flow to the session your UI reads
-      session.user.id = token.sub as string;
-      (session.user as any).twitchId = (token as any).twitchId ?? null;
-      session.user.name = (token as any).displayName ?? session.user.name ?? null;
-      session.user.image = (token as any).image ?? session.user.image ?? null;
-      return session;
-    },
+        // Populate standard fields so TS is happy
+        const name = (token as any).displayName ?? session.user?.name ?? "Twitch User";
+        const image = (token as any).profileImageUrl ?? session.user?.image;
+
+        // NextAuth expects user to exist
+        session.user = {
+            ...(session.user ?? {}),
+            name,
+            image,
+        };
+
+        // Keep access token if you want it later
+        // @ts-ignore
+        session.accessToken = (token as any).access_token;
+
+        return session;
+        },
   },
+  secret: process.env.NEXTAUTH_SECRET,
 };
+
