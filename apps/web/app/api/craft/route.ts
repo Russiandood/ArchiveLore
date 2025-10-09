@@ -1,6 +1,8 @@
 // apps/web/app/api/craft/route.ts
 import { NextResponse } from "next/server";
-import { Redis } from "@upstash/redis";  
+import { Redis } from "@upstash/redis";
+import { RedisKeys, TTL } from "@/lib/redisKeys";
+
 export const runtime = "edge"; // you can switch to "nodejs" while debugging
 
 export async function POST(req: Request) {
