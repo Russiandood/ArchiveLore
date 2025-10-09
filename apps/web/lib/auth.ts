@@ -7,6 +7,7 @@ export const authOptions: NextAuthOptions = {
     TwitchProvider({
       clientId: process.env.TWITCH_CLIENT_ID!,
       clientSecret: process.env.TWITCH_CLIENT_SECRET!,
+      authorization: { params: { force_verify: true } },
       profile(profile) {
         const p = profile as any;
         const twitchId = p.sub ?? p.id?.toString();
