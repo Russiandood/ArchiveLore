@@ -3,9 +3,9 @@ import TwitchProvider from "next-auth/providers/twitch";
 
 // Fallback so previews work (sets NEXTAUTH_URL if missing)
 const url =
-  process.env.NEXTAUTH_URL ??
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
-process.env.NEXTAUTH_URL = url;
+    process.env.NEXTAUTH_URL ??
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+    process.env.NEXTAUTH_URL = url;
 
 // NOTE: do NOT export this from a route file
 const authOptions: AuthOptions = {
@@ -58,4 +58,4 @@ const authOptions: AuthOptions = {
 };
 
 const handler = NextAuth(authOptions);
-export { handler as GET, handler as POST };
+export { handler as GET, handler as POST, authOptions };

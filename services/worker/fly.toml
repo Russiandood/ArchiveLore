@@ -3,6 +3,3 @@ primary_region = "sjc"
 
 [build]
   dockerfile = "Dockerfile"
-
-[env]
-  REDIS_URL ="rediss://default:ASTrAAImcDIwODVjZWIzMjkwNmY0MzA0OTZmMWE1NzcwOTIzODU4MnAyOTQ1MQ@engaging-stud-9451.upstash.io:6379"

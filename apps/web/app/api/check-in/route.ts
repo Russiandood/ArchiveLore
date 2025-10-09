@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import crypto from "crypto";
 
-const API_BASE = process.env.API_BASE_URL || "https://osg-api.fly.dev";
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "https://osg-api.fly.dev";
 
 function hmacSign(body: string, key: string) {
   return crypto.createHmac("sha256", key).update(body).digest("hex");
