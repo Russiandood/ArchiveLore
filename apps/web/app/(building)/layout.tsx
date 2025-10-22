@@ -6,7 +6,7 @@ export const revalidate = 0;
 export default function BuildingLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col">
-      <BuilderRegistry />  {/* ensures custom components are registered on the client */}
+      <BuilderRegistry />
       {children}
     </div>
   );
