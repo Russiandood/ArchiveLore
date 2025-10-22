@@ -48,4 +48,3 @@ Builder.registerComponent(FeatureGrid, {
   ],
 });
 
-console.log('Builder: custom components registered');
