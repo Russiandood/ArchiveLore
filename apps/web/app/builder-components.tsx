@@ -1,7 +1,5 @@
 'use client';
 
-console.log('Builder: custom components registered');
-
 import { Builder } from '@builder.io/react';
 
 function Hero({ title, subtitle, children }: { title: string; subtitle?: string; children?: React.ReactNode }) {
@@ -20,7 +18,7 @@ Builder.registerComponent(Hero, {
     { name: 'title', type: 'text', required: true },
     { name: 'subtitle', type: 'longText' },
   ],
-  canHaveChildren: true, // lets editors drop buttons, images, etc. inside
+  canHaveChildren: true,
 });
 
 function FeatureGrid({ items = [] as { title: string; body?: string }[] }) {
@@ -49,3 +47,6 @@ Builder.registerComponent(FeatureGrid, {
     },
   ],
 });
+
+// Debug line so we can confirm this file runs in the preview iframe:
+console.log('Builder: custom components registered');
