@@ -18,5 +18,5 @@ export default async function Page({ params, searchParams }: Props) {
 
   if (!content) return null;
 
-  return <BuilderComponent model="page" content={content} />;
+  return <BuilderComponent model="builder-page" content={content} />;
 }
