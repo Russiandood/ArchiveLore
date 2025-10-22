@@ -1,7 +1,7 @@
 import { builder } from '@/lib/builder';
-import { BuilderComponent } from '@builder.io/react';
+import BuilderContentClient from '@/components/BuilderContentClient';
 
-export const dynamic = 'force-dynamic'; // never pre-render at build
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 type Props = {
@@ -13,7 +13,7 @@ export default async function Page({ params, searchParams }: Props) {
   const urlPath = '/' + (params.slug?.join('/') ?? '');
   const isPreview = Object.prototype.hasOwnProperty.call(searchParams, 'builder.preview');
 
-  // If the key isn't available at build for any reason, fail soft.
+  // Soft-guard if key isn’t injected during build-time analysis
   if (!process.env.NEXT_PUBLIC_BUILDER_API_KEY) {
     return null;
   }
@@ -23,8 +23,7 @@ export default async function Page({ params, searchParams }: Props) {
     .toPromise()
     .catch(() => null);
 
-  // Don’t throw notFound() at build time; fail soft so build can finish.
   if (!content) return null;
 
-  return <BuilderComponent model="builder-page" content={content} />;
+  return <BuilderContentClient model="builder-page" content={content} />;
 }
