@@ -1,5 +1,7 @@
 'use client';
 
+console.log('Builder: custom components registered');
+
 import { Builder } from '@builder.io/react';
 
 function Hero({ title, subtitle, children }: { title: string; subtitle?: string; children?: React.ReactNode }) {
