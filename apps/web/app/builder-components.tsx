@@ -48,5 +48,4 @@ Builder.registerComponent(FeatureGrid, {
   ],
 });
 
-// Debug line so we can confirm this file runs in the preview iframe:
 console.log('Builder: custom components registered');
