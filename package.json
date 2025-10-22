@@ -18,6 +18,8 @@
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.10.0",
+    "@builder.io/react": "^8.2.8",
+    "@builder.io/sdk-react": "^4.2.4",
     "@prisma/client": "^5.15.0",
     "next-auth": "^4.24.11",
     "prisma": "^5.15.0"
