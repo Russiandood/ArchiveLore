@@ -1,4 +1,4 @@
-import '@/app/builder-components';
+import '../builder-components';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
