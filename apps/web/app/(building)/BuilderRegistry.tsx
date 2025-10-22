@@ -1,3 +1,9 @@
 'use client';
+
 import '../builder-components';
-export default function BuilderRegistry() { return null; }
+
+console.log('BuilderRegistry mounted'); // DEBUG
+
+export default function BuilderRegistry() { 
+  return null; 
+}
