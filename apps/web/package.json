@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@builder.io/react": "^8.2.8",
+    "@builder.io/sdk": "^6.1.2",
     "@builder.io/sdk-react": "^4.2.4",
     "@upstash/redis": "^1.35.5",
     "next": "14.2.4",
